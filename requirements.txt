@@ -13,7 +13,7 @@ google-genai==1.52.0
 # Video Processing
 opencv-python-headless==4.11.0.86
 gdown==5.2.0
-av==16.0.1
+av==10.*
 
 # Utils
 numpy<2.0.0
