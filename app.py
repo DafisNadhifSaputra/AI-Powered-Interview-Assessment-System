@@ -466,7 +466,7 @@ def process_api_request(request_json: str) -> str:
 
 with gr.Blocks(title="AI Interview Assessment System") as demo:
     gr.Markdown("""
-    # 🎯 AI-Powered Interview Assessment System
+    # AI-Powered Interview Assessment System
     
     Sistem ini menganalisis video wawancara menggunakan:
     - 🎤 **Faster Whisper** - Transkripsi speech-to-text
