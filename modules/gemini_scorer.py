@@ -148,7 +148,7 @@ In the ACTION segment specifically:
 Provide your assessment in this exact JSON format:
 {{
     "score": <0-4>,
-    "reason": "<1-2 sentence justification for the score>",
+    "reason": "<DETAILED EXPLANATION (3-5 sentences): Explain WHY this score was given. Include: 1) Content quality and relevance to question, 2) STAR structure compliance and specificity, 3) Argumentation strength with examples, 4) Speech fluency observations, 5) Eye behavior interpretation. Be thorough and specific.>",
     
     "star_analysis": {{
         "situation_present": <true|false>,
@@ -200,7 +200,7 @@ Provide your assessment in this exact JSON format:
         "authenticity_score": <0-4>
     }},
     
-    "notes": "<DETAILED NOTES FOR INTERVIEWER: Summarize 1) Content quality and STAR compliance, 2) Argumentation strength, 3) Speech fluency observations, 4) Eye behavior interpretation, 5) Any red flags or exceptional qualities. Write 3-5 sentences.>",
+    "notes": "<SHORT NOTE (1 sentence): Quick summary for interviewer - e.g., 'Lancar dan meyakinkan', 'Perlu lebih spesifik', 'Tidak mencurigakan', 'Ada tanda membaca', etc.>",
     
     "improvement_suggestions": "<Specific, actionable advice for the candidate to improve>"
 }}
@@ -255,7 +255,7 @@ def assess_interview(
     transcript: str,
     eye_metrics: Dict,
     position_id: int,
-    model: str = "gemini-2.0-flash"
+    model: str = "gemini-2.5-flash"
 ) -> Tuple[int, str, Dict]:
     """
     Assess an interview response using Gemini.
@@ -281,9 +281,10 @@ def assess_interview(
             model=model,
             contents=prompt,
             config=types.GenerateContentConfig(
+                thinking_config=types.ThinkingConfig(thinking_budget=1500),
                 temperature=0.2,  # Lower temperature for consistent psychometric scoring
                 top_p=0.95,
-                max_output_tokens=2048  # Increased for comprehensive analysis
+                max_output_tokens=3000  # Increased for comprehensive analysis
             )
         )
         
