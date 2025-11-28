@@ -3,9 +3,9 @@ gradio==6.0.1
 fastapi==0.122.0
 uvicorn==0.38.0
 
-# AI/ML - versions compatible with HuggingFace Spaces
-faster-whisper==1.1.0
-ctranslate2==4.5.0
+# AI/ML - Use older stable versions for HuggingFace Spaces
+faster-whisper==0.10.1
+ctranslate2==3.24.0
 onnxruntime==1.19.2
 mediapipe==0.10.14
 google-genai==1.52.0
