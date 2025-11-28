@@ -3,9 +3,9 @@ gradio==6.0.1
 fastapi==0.122.0
 uvicorn==0.38.0
 
-# AI/ML
-faster-whisper==1.2.1
-ctranslate2==4.4.0
+# AI/ML - versions compatible with HuggingFace Spaces
+faster-whisper==1.1.0
+ctranslate2==4.5.0
 onnxruntime==1.19.2
 mediapipe==0.10.14
 google-genai==1.52.0
@@ -16,6 +16,6 @@ gdown==5.2.0
 av==16.0.1
 
 # Utils
-numpy==2.2.6
+numpy<2.0.0
 python-multipart==0.0.20
 pydantic==2.12.4
