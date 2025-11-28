@@ -1,0 +1,18 @@
+venv/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# MediaPipe models (downloaded at runtime)
+*.task
+face_landmarker*.task
+
+# Test files
+test_*.py
+
+# Temp
+*.log
+temp_videos/
