@@ -74,7 +74,6 @@ def transcribe_video(
         language=language,
         vad_filter=True,
         vad_parameters=dict(
-            threshold=0.3,              # Sensitif menangkap suara
             min_speech_duration_ms=250,  # Tangkap ucapan pendek
             max_speech_duration_s=30,    # Segment max 30 detik
             min_silence_duration_ms=300, # Pause pendek antar kalimat
