@@ -1,8 +1,3 @@
-"""
-AI-Powered Interview Assessment System
-Analyzes interview videos using Whisper transcription, MediaPipe eye tracking, and Gemini LLM scoring.
-"""
-
 import gradio as gr
 import json
 import os
@@ -11,13 +6,11 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 import traceback
 
-# Import modules
 from modules.video_downloader import download_video, cleanup_video
 from modules.transcription import transcribe_video, get_whisper_model
 from modules.eye_tracking import analyze_video as analyze_eye_tracking
 from modules.gemini_scorer import assess_interview
 
-# Pre-load Whisper model at startup to avoid timeout during processing
 print("Pre-loading Whisper model...")
 try:
     get_whisper_model()
@@ -36,18 +29,6 @@ def process_single_interview(
     video_url: str,
     progress_callback=None
 ) -> Dict:
-    """
-    Process a single interview video.
-    
-    Args:
-        position_id: Position/question ID
-        question: Interview question
-        video_url: Google Drive video URL
-        progress_callback: Optional callback for progress updates
-    
-    Returns:
-        Dictionary with processing results
-    """
     video_path = None
     
     try:
@@ -132,10 +113,6 @@ def process_interview_ui(
     video_url_5: str = "", question_5: str = "",
     progress=gr.Progress()
 ) -> Tuple[str, str, str, str, str, str]:
-    """
-    Process interviews from UI inputs.
-    Returns formatted results for display.
-    """
     try:
         # Collect valid interviews
         interviews = []
@@ -153,7 +130,7 @@ def process_interview_ui(
         
         if not interviews:
             return (
-                "❌ Error", 
+                "Error", 
                 "No valid Google Drive video URLs provided", 
                 "", 
                 "0", 
@@ -259,18 +236,16 @@ def process_interview_ui(
             if note:
                 overall_notes_parts.append(note)
         
-        # Combine overall notes or generate summary
+        # Combine overall notes
         if overall_notes_parts:
             overall_notes = " ".join(overall_notes_parts)
         else:
             overall_notes = f"Processed {len(interviews)} interviews. Average score: {avg_score:.1f}/4."
         
-        # Build API response JSON - STRICT FORMAT per project requirements
-        # Only id, score, reason in scores array
+        # Build API response JSON
         scores_simple = []
         for r in results:
             full_assessment = r.get("full_assessment", {})
-            # Reason should contain the comprehensive analysis
             reason_text = r.get("reasoning", "")
             if not reason_text or reason_text == "Assessment completed":
                 reason_text = full_assessment.get("notes", "No detailed analysis available")
@@ -281,7 +256,7 @@ def process_interview_ui(
                 "reason": reason_text
             })
         
-        # Calculate interview score as sum of individual scores (percentage of max possible)
+        # Calculate interview score 
         total_score = sum(s["score"] for s in scores_simple)
         max_possible = len(scores_simple) * 4
         interview_score_pct = round((total_score / max_possible) * 100, 1) if max_possible > 0 else 0
@@ -353,10 +328,6 @@ def process_interview_ui(
 # ============================================
 
 def process_api_request(request_json: str) -> str:
-    """
-    API endpoint for programmatic access.
-    Accepts JSON input, returns JSON output.
-    """
     try:
         data = json.loads(request_json)
         
@@ -391,7 +362,7 @@ def process_api_request(request_json: str) -> str:
         
         avg_score = sum(scores) / len(scores) if scores else 0
         
-        # Calculate interview score as percentage
+        # Calculate interview score 
         total_score = sum(scores)
         max_possible = len(scores) * 4
         interview_score_pct = round((total_score / max_possible) * 100, 1) if max_possible > 0 else 0
@@ -477,14 +448,12 @@ with gr.Blocks(title="AI Interview Assessment System") as demo:
     """)
     
     with gr.Tabs():
-        # Tab 1: User-friendly UI
         with gr.TabItem("📝 Assessment Form"):
             gr.Markdown("### Masukkan Video Interview")
             gr.Markdown("Paste Google Drive video URL untuk pertanyaan interview.")
             
             with gr.Row():
                 with gr.Column(scale=2):
-                    # Interview 1 (Always visible)
                     with gr.Group():
                         gr.Markdown("#### 📹 Interview 1")
                         question_1 = gr.Textbox(
@@ -499,7 +468,7 @@ with gr.Blocks(title="AI Interview Assessment System") as demo:
                             lines=1
                         )
                     
-                    # Additional interviews (collapsible)
+                    # Additional interviews 
                     with gr.Accordion("➕ Tambah Interview Lainnya (Opsional)", open=False):
                         with gr.Group():
                             gr.Markdown("#### 📹 Interview 2")
@@ -613,7 +582,6 @@ with gr.Blocks(title="AI Interview Assessment System") as demo:
                 ]
             )
         
-        # Tab 2: API Documentation
         with gr.TabItem("🔌 API Documentation"):
             gr.Markdown("""
             ## API Endpoint
