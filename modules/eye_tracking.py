@@ -1,8 +1,3 @@
-"""
-Eye Tracking Module
-Analyzes eye movement and gaze direction using MediaPipe Face Landmarker
-"""
-
 import cv2
 import numpy as np
 from typing import Optional, Dict, List, Tuple
@@ -19,15 +14,14 @@ except ImportError:
     MEDIAPIPE_AVAILABLE = False
     print("Warning: MediaPipe not available. Eye tracking will use fallback mode.")
 
-# MediaPipe Face Mesh landmark indices for eyes
 # Left eye landmarks
 LEFT_EYE_INDICES = [362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398]
 # Right eye landmarks  
 RIGHT_EYE_INDICES = [33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246]
 
-# Iris landmarks (center points)
-LEFT_IRIS_CENTER = 473   # Center of left iris
-RIGHT_IRIS_CENTER = 468  # Center of right iris
+# Iris landmarks 
+LEFT_IRIS_CENTER = 473   
+RIGHT_IRIS_CENTER = 468  
 
 # Eye corner landmarks for gaze calculation
 LEFT_EYE_LEFT_CORNER = 263
@@ -40,12 +34,6 @@ _face_detector = None
 
 
 def download_model_if_needed() -> str:
-    """
-    Download MediaPipe face landmarker model if not present.
-    
-    Returns:
-        Path to model file
-    """
     if not MEDIAPIPE_AVAILABLE:
         return ""
         
@@ -61,13 +49,6 @@ def download_model_if_needed() -> str:
 
 
 def get_face_detector():
-    """
-    Get or initialize Face Landmarker.
-    Uses lazy loading to save memory.
-    
-    Returns:
-        FaceLandmarker instance or None if MediaPipe not available
-    """
     if not MEDIAPIPE_AVAILABLE:
         return None
         
@@ -91,16 +72,6 @@ def get_face_detector():
 
 
 def calculate_eye_aspect_ratio(landmarks: List, eye_indices: List[int]) -> float:
-    """
-    Calculate Eye Aspect Ratio (EAR) for blink detection.
-    
-    Args:
-        landmarks: Face landmarks
-        eye_indices: Indices of eye landmarks
-    
-    Returns:
-        EAR value (lower = more closed)
-    """
     # Get vertical eye landmarks
     top = landmarks[eye_indices[1]]
     bottom = landmarks[eye_indices[5]]
@@ -121,19 +92,6 @@ def calculate_eye_aspect_ratio(landmarks: List, eye_indices: List[int]) -> float
 
 def calculate_gaze_ratio(landmarks: List, iris_center_idx: int, 
                          left_corner_idx: int, right_corner_idx: int) -> float:
-    """
-    Calculate horizontal gaze ratio.
-    0 = looking left, 0.5 = center, 1 = looking right
-    
-    Args:
-        landmarks: Face landmarks
-        iris_center_idx: Index of iris center
-        left_corner_idx: Index of left eye corner
-        right_corner_idx: Index of right eye corner
-    
-    Returns:
-        Gaze ratio (0-1)
-    """
     iris = landmarks[iris_center_idx]
     left_corner = landmarks[left_corner_idx]
     right_corner = landmarks[right_corner_idx]
@@ -148,16 +106,6 @@ def calculate_gaze_ratio(landmarks: List, iris_center_idx: int,
 
 
 def analyze_frame(frame: np.ndarray, detector) -> Optional[Dict]:
-    """
-    Analyze a single frame for eye metrics.
-    
-    Args:
-        frame: BGR image frame
-        detector: FaceLandmarker instance
-    
-    Returns:
-        Dictionary with eye metrics or None if no face detected
-    """
     if not MEDIAPIPE_AVAILABLE or detector is None:
         return None
         
@@ -188,7 +136,6 @@ def analyze_frame(frame: np.ndarray, detector) -> Optional[Dict]:
     # Average gaze (0.5 = looking at camera)
     avg_gaze = (left_gaze + right_gaze) / 2
     
-    # Calculate eye contact score (how close to center)
     # 1.0 = perfect eye contact, 0.0 = looking away
     eye_contact_score = 1.0 - abs(avg_gaze - 0.5) * 2
     
@@ -212,17 +159,6 @@ def analyze_video(
     sample_rate: int = 3,   # Analyze every 3rd frame (~10 FPS for 30fps video)
     max_frames: int = 1000  # Maximum frames to analyze (covers ~5 min video)
 ) -> Dict:
-    """
-    Analyze eye movement throughout a video.
-    
-    Args:
-        video_path: Path to video file
-        sample_rate: Analyze every Nth frame (higher = faster but less accurate)
-        max_frames: Maximum number of frames to analyze
-    
-    Returns:
-        Dictionary with aggregated eye metrics
-    """
     if not os.path.exists(video_path):
         raise FileNotFoundError(f"Video file not found: {video_path}")
     
@@ -299,12 +235,12 @@ def analyze_video(
             "analysis_notes": "No face detected in video"
         }
     
-    # Eye contact: percentage of time looking at camera (gaze near 0.5)
+    # Eye contact
     eye_contact_threshold = 0.3  # Consider looking at camera if within this range
     eye_contact_frames = sum(1 for g in gaze_values if abs(g - 0.5) < eye_contact_threshold)
     eye_contact_percentage = (eye_contact_frames / len(gaze_values)) * 100
     
-    # Gaze stability: inverse of standard deviation (less movement = more stable)
+    # Gaze stability
     gaze_std = np.std(gaze_values)
     gaze_stability = max(0, 1 - gaze_std * 2) * 100  # Convert to percentage
     
@@ -315,7 +251,7 @@ def analyze_video(
     looking_away_frames = sum(1 for g in gaze_values if abs(g - 0.5) >= eye_contact_threshold)
     looking_away_percentage = (looking_away_frames / len(gaze_values)) * 100
     
-    # Overall attention score (weighted average)
+    # Overall attention score 
     attention_score = (
         avg_eye_contact * 0.4 +
         gaze_stability * 0.3 +
