@@ -4,7 +4,6 @@ from typing import Optional, Dict, List, Tuple
 import os
 import urllib.request
 
-# Try to import MediaPipe (may not be available on all Python versions)
 try:
     import mediapipe as mp
     from mediapipe.tasks import python
@@ -236,13 +235,13 @@ def analyze_video(
         }
     
     # Eye contact
-    eye_contact_threshold = 0.3  # Consider looking at camera if within this range
+    eye_contact_threshold = 0.3  
     eye_contact_frames = sum(1 for g in gaze_values if abs(g - 0.5) < eye_contact_threshold)
     eye_contact_percentage = (eye_contact_frames / len(gaze_values)) * 100
     
     # Gaze stability
     gaze_std = np.std(gaze_values)
-    gaze_stability = max(0, 1 - gaze_std * 2) * 100  # Convert to percentage
+    gaze_stability = max(0, 1 - gaze_std * 2) * 100  
     
     # Average eye contact score
     avg_eye_contact = np.mean(eye_contact_scores) * 100
