@@ -1,9 +1,3 @@
-"""
-Gemini Scoring Module
-Uses Google Gemini LLM to score interview responses
-Based on psychometric framework from I/O Psychology research
-"""
-
 import os
 import json
 import re
@@ -13,13 +7,6 @@ from google.genai import types
 
 
 def get_gemini_client() -> genai.Client:
-    """
-    Initialize Gemini client.
-    Uses GEMINI_API_KEY environment variable.
-    
-    Returns:
-        Gemini client instance
-    """
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise ValueError("GEMINI_API_KEY environment variable not set. Please set it with: set GEMINI_API_KEY=your_api_key")
@@ -33,19 +20,6 @@ def create_assessment_prompt(
     eye_metrics: Dict,
     position_id: int
 ) -> str:
-    """
-    Create prompt for interview assessment based on psychometric framework.
-    Uses STAR method, Toulmin argumentation, and validated I/O psychology metrics.
-    
-    Args:
-        question: Interview question
-        transcript: Transcribed answer
-        eye_metrics: Eye tracking analysis results
-        position_id: Position/question ID
-    
-    Returns:
-        Formatted prompt string
-    """
     prompt = f"""You are an expert Industrial/Organizational (I/O) Psychologist specializing in structured interview assessment.
 Your evaluation must follow evidence-based psychometric principles with validated predictive validity.
 
@@ -209,18 +183,7 @@ Provide your assessment in this exact JSON format:
 
 
 def parse_gemini_response(response_text: str) -> Dict:
-    """
-    Parse Gemini response to extract JSON.
-    
-    Args:
-        response_text: Raw response from Gemini
-    
-    Returns:
-        Parsed dictionary
-    """
-    # Try to extract JSON from response
     try:
-        # First, try direct JSON parsing
         return json.loads(response_text)
     except json.JSONDecodeError:
         pass
@@ -241,7 +204,6 @@ def parse_gemini_response(response_text: str) -> Dict:
             except json.JSONDecodeError:
                 continue
     
-    # If all parsing fails, return default structure
     return {
         "score": 2,
         "confidence_level": "LOW",
@@ -257,26 +219,11 @@ def assess_interview(
     position_id: int,
     model: str = "gemini-2.5-flash"
 ) -> Tuple[int, str, Dict]:
-    """
-    Assess an interview response using Gemini.
-    
-    Args:
-        question: Interview question
-        transcript: Transcribed answer
-        eye_metrics: Eye tracking results
-        position_id: Position/question ID
-        model: Gemini model to use
-    
-    Returns:
-        Tuple of (score, reasoning, full_assessment)
-    """
     client = get_gemini_client()
     
-    # Create assessment prompt
     prompt = create_assessment_prompt(question, transcript, eye_metrics, position_id)
     
     try:
-        # Generate response
         response = client.models.generate_content(
             model=model,
             contents=prompt,
@@ -294,19 +241,18 @@ def assess_interview(
         
         # Extract score and reasoning
         score = assessment.get("score", 2)
-        score = max(0, min(4, int(score)))  # Clamp to 0-4
+        score = max(0, min(4, int(score))) 
         
-        # Get reason (brief) and notes (detailed observations)
+        # Get reason and notes 
         reason = assessment.get("reason", assessment.get("reasoning", "Assessment completed"))
         notes = assessment.get("notes", "")
         
-        # Calculate weighted final score based on psychometric framework
         # Verbal (STAR + Toulmin) = 75%, Visual (Eye) = 15%, Fluency = 10%
         star_score = assessment.get("star_analysis", {}).get("star_score", score)
         toulmin_score = assessment.get("toulmin_analysis", {}).get("argumentation_score", score)
         fluency_score = assessment.get("fluency_analysis", {}).get("fluency_score", score)
         
-        # Weighted calculation (Late Fusion approach)
+        # Weighted calculation 
         verbal_score = (star_score + toulmin_score) / 2
         weighted_score = (0.75 * verbal_score) + (0.15 * score) + (0.10 * fluency_score)
         final_score = max(0, min(4, round(weighted_score)))
@@ -336,18 +282,6 @@ def batch_assess_interviews(
     eye_metrics: Dict[int, Dict],
     model: str = "gemini-2.0-flash"
 ) -> list:
-    """
-    Assess multiple interviews.
-    
-    Args:
-        interviews: List of interview data with positionId and question
-        transcripts: Dict mapping positionId to transcript
-        eye_metrics: Dict mapping positionId to eye metrics
-        model: Gemini model to use
-    
-    Returns:
-        List of assessment results
-    """
     results = []
     
     for interview in interviews:
