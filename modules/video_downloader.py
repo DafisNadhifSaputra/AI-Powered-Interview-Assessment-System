@@ -51,15 +51,15 @@ def download_video(url: str, output_dir: Optional[str] = None) -> Tuple[str, boo
 
 
 def cleanup_video(file_path: str) -> bool:
+    try:
         if os.path.exists(file_path):
             os.remove(file_path)
-            # Try to remove parent temp directory if empty
             parent_dir = os.path.dirname(file_path)
             if parent_dir and os.path.exists(parent_dir):
                 try:
                     os.rmdir(parent_dir)
                 except OSError:
-                    pass  # Directory not empty, that's fine
+                    pass  
             return True
         return False
     except Exception as e:
