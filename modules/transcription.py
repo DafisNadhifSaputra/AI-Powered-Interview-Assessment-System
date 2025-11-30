@@ -7,7 +7,7 @@ _model: Optional[WhisperModel] = None
 _current_model_size: Optional[str] = None
 
 
-def get_whisper_model(model_size: str = "large-v3-turbo") -> WhisperModel:
+def get_whisper_model(model_size: str = "Dafisns/whisper-turbo-multilingual-cf-ct2") -> WhisperModel:
     global _model, _current_model_size
     
     if _model is None or _current_model_size != model_size:
@@ -31,7 +31,7 @@ def get_whisper_model(model_size: str = "large-v3-turbo") -> WhisperModel:
 def transcribe_video(
     video_path: str,
     language: Optional[str] = None,
-    model_size: str = "large-v3-turbo"
+    model_size: str = "Dafisns/whisper-turbo-multilingual-cf-ct2"
 ) -> Tuple[str, dict]:
     if not os.path.exists(video_path):
         raise FileNotFoundError(f"Video file not found: {video_path}")
