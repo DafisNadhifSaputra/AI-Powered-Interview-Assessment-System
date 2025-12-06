@@ -32,7 +32,7 @@ def process_single_interview(
     video_path = None
     
     try:
-        # Step 1: Download video
+        # Download video
         if progress_callback:
             progress_callback(f"[{position_id}] Downloading video...")
         
@@ -46,7 +46,7 @@ def process_single_interview(
                 "eye_metrics": {}
             }
         
-        # Step 2: Transcribe audio
+        # Transcribe audio
         if progress_callback:
             progress_callback(f"[{position_id}] Transcribing audio...")
         
@@ -56,7 +56,7 @@ def process_single_interview(
             transcript = ""
             metadata = {"error": str(e)}
         
-        # Step 3: Analyze eye movement
+        # Analyze eye movement
         if progress_callback:
             progress_callback(f"[{position_id}] Analyzing eye movement...")
         
@@ -65,7 +65,7 @@ def process_single_interview(
         except Exception as e:
             eye_metrics = {"error": str(e), "eye_contact_percentage": 0}
         
-        # Step 4: Get Gemini assessment
+        # Get Gemini assessment
         if progress_callback:
             progress_callback(f"[{position_id}] Getting AI assessment...")
         
@@ -100,7 +100,6 @@ def process_single_interview(
         }
     
     finally:
-        # Cleanup downloaded video
         if video_path:
             cleanup_video(video_path)
 
@@ -159,7 +158,6 @@ def process_interview_ui(
         
         # Calculate overall metrics
         avg_score = sum(scores) / len(scores) if scores else 0
-        interview_percentage = (avg_score / 4) * 100
         
         # Determine decision
         if avg_score >= 3:
@@ -670,7 +668,7 @@ with gr.Blocks(title="AI Interview Assessment System") as demo:
 }''',
                 lines=15
             )
-            api_test_btn = gr.Button("🧪 Test API", variant="secondary")
+            api_test_btn = gr.Button("Test API", variant="secondary")
             api_output = gr.Code(label="Response JSON", language="json", lines=20)
             
             api_test_btn.click(
@@ -682,7 +680,7 @@ with gr.Blocks(title="AI Interview Assessment System") as demo:
 
 # Launch
 if __name__ == "__main__":
-    demo.queue()  # Enable queue for long-running tasks
+    demo.queue()  
     demo.launch(
         server_name="0.0.0.0",
         server_port=7860,

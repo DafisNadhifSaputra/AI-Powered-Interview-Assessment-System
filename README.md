@@ -92,19 +92,6 @@ response = requests.post(
 )
 result = response.json()
 ```
-
-## Environment Variables
-
-Set the following in Hugging Face Spaces secrets:
-
-- `GEMINI_API_KEY`: Your Google Gemini API key
-
-## Limitations (Free Tier)
-
-- Video duration: 5-10 minutes recommended
-- Processing time: 1-3 minutes per video
-- Sequential processing (one video at a time)
-
 ## Tech Stack
 
 - Gradio 4.44.0

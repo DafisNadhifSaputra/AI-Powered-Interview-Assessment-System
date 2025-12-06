@@ -188,7 +188,6 @@ def parse_gemini_response(response_text: str) -> Dict:
     except json.JSONDecodeError:
         pass
     
-    # Try to find JSON block in response
     json_patterns = [
         r'```json\s*(.*?)\s*```',
         r'```\s*(.*?)\s*```',
@@ -229,9 +228,9 @@ def assess_interview(
             contents=prompt,
             config=types.GenerateContentConfig(
                 thinking_config=types.ThinkingConfig(thinking_budget=1500),
-                temperature=0.2,  # Lower temperature for consistent psychometric scoring
+                temperature=0.2,  
                 top_p=0.95,
-                max_output_tokens=3000  # Increased for comprehensive analysis
+                max_output_tokens=3500
             )
         )
         
@@ -280,7 +279,7 @@ def batch_assess_interviews(
     interviews: list,
     transcripts: Dict[int, str],
     eye_metrics: Dict[int, Dict],
-    model: str = "gemini-2.0-flash"
+    model: str = "gemini-2.5-flash"
 ) -> list:
     results = []
     

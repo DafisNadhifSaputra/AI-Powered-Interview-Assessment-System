@@ -71,7 +71,7 @@ def transcribe_video(
         words = text.split()
         if len(words) > 5:
             unique_ratio = len(set(words)) / len(words)
-            if unique_ratio < 0.3:  # Too many repeated words
+            if unique_ratio < 0.3:  
                 print(f"  [SKIPPED - repetition]: {text[:50]}...")
                 continue
         
@@ -103,13 +103,12 @@ def transcribe_video(
 def transcribe_with_timestamps(
     video_path: str,
     language: Optional[str] = None,
-    model_size: str = "small"
+    model_size: str = "Dafisns/whisper-turbo-multilingual-cf-ct2"
 ) -> List[dict]:
     _, metadata = transcribe_video(video_path, language, model_size)
     return metadata["segments"]
 
 
 if __name__ == "__main__":
-    # Test transcription
     print("Transcription module loaded")
     print("Usage: transcribe_video('path/to/video.mp4')")
